@@ -46,15 +46,20 @@
 #include "power-common.h"
 #include "utils.h"
 
-static int display_fd;
 #define SYS_DISPLAY_PWR "/sys/kernel/hbtp/display_pwr"
 
+#ifdef SYS_KERNEL_PWR_DISABLED
+int set_interactive_override() {
+    return HINT_HANDLED;
+}
+#else
 int set_interactive_override(int on) {
     static const char* display_on = "1";
     static const char* display_off = "0";
     char err_buf[80];
     static int init_interactive_hint = 0;
     int rc = 0;
+    static int display_fd;
 
     if (init_interactive_hint == 0) {
         // First time the display is turned off
@@ -81,6 +86,7 @@ int set_interactive_override(int on) {
     }
     return HINT_HANDLED;
 }
+#endif
 
 int power_hint_override(power_hint_t hint, void* UNUSED(data)) {
     int ret_val = HINT_NONE;
